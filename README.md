@@ -1,9 +1,9 @@
 # Synchronous FIFO
 
 ## Overview
-A **FIFO (First-In, First-Out) ** is a data buffer commonly used for communicating data between two systems operating at different data rates. Data written into the FIFO comes out in the same order it was entered: the first value written in is the first value read. 
+A **FIFO (First-In, First-Out)** is a data buffer commonly used for communicating data between two systems operating at different data rates. Data written into the FIFO comes out in the same order it was entered: the first value written in is the first value read. 
 
-In **Synchronous FIFOs**, both writing and writing are controlled by the same clock. 
+In **Synchronous FIFOs**, both writing and reading are controlled by the same clock. 
 
 ![image](https://github.com/user-attachments/assets/e2267c8c-57be-4a32-94c1-56136e83b4e2)
 
@@ -59,7 +59,7 @@ While the FIFO and testbench work reliably for some values of num_cycles, I obse
 In the future, I’d refine the emptying logic to ensure that each read enable matches a valid entry in the model, and that no extra reads are performed after the FIFO is empty. This will help prevent off-by-one mismatches and improve the reliability of the testbench.
 
 Also the following improvements can be added: 
-* Extend tb coverage to additional edge cases (e.g. randomized read/write intervals)
+* Extend testbench coverage to additional edge cases (e.g. randomized read/write intervals)
 * Parametrizing FIFO
 
 **TCL Console output for num_cycles=5, write_interval=2, read_interval=3**
