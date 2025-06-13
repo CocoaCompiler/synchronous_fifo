@@ -31,19 +31,46 @@ The SystemVerilog testbench verifies FIFO functionality using two main tests:
 * **Test 1**: Fills the FIFO to capacity and then empties it, checking that the empty flag is set correctly.
 ![image](https://github.com/user-attachments/assets/dea366a5-c6d6-4834-b5a6-41de8ecc1e18)
 
-* **Test 2**: Performs mixed-rate read and write operations. A reference queue models expected output, and each FIFO read is compared against it using assertions. This test ensures all data is read out in the correct order and the FIFO is empty at the end.
+* **Test 2** reads and writes to the FIFO at different rates over num_cycles clock cycles. It checks that the data is stored and read in the right order, even when operations overlap. This test also empties out the FIFO after num_cycles clock cycles and verifies the output and empty flag.
   
-![image](https://github.com/user-attachments/assets/fd74e9fb-e034-4574-89c7-d2efd6697c88)
+![image](https://github.com/user-attachments/assets/8782249d-c2fe-4225-ae5a-078920822a9f)
 
 **Writing/Reading to FIFO at mixed rates**
 ![image](https://github.com/user-attachments/assets/566061e3-07f3-4ed1-8787-6a74d12f297d)
 
 **Emptying FIFO and comparing output to model**
-![image](https://github.com/user-attachments/assets/d9a60d73-d6b9-4607-a5f2-bdfb9d444f4d)
+![image](https://github.com/user-attachments/assets/83891f76-0f88-4e8c-9d2b-3a1013b83a3f)
 
-## Simulation 
-**Simulation results** for write_interval=2, read_interval=3, num_cycles=5. 
+## Simulation Results
+**Simulation results** for write_interval=2, read_interval=3, num_cycles=10.
 
+**TCL Console**
+The TCL console output shows the full simulation log, including all writes, reads, and value comparisons. Each assertion is checked in real time; any failure would halt the simulation. The final summary confirms the FIFO passed all test cases.
+![image](https://github.com/user-attachments/assets/abf84ad2-e4e2-42ad-a389-fc26726a788d)
 
-  
+**Waveform**
+![image](https://github.com/user-attachments/assets/9ca904e6-7e23-4aa1-8658-8caad3f23783)
+The waveform illustrates FIFO operation at the signal level. It shows the clock and reset activity, how and when data is written or read, and how the FIFO’s full and empty flags respond.
 
+## Areas of Improvement
+### Data Mismatches with certain num_cycles
+While the FIFO and testbench work reliably for some values of num_cycles, I observed that the testbench occasionally reports a mismatch like Expected X, got X+1 during the emptying phase. This points to an extra read being issued towards the end of the test.
+
+In the future, I’d refine the emptying logic to ensure that each read enable matches a valid entry in the model, and that no extra reads are performed after the FIFO is empty. This will help prevent off-by-one mismatches and improve the reliability of the testbench.
+
+Also the following improvements can be added: 
+* Extend tb coverage to additional edge cases (e.g. randomized read/write intervals)
+* Parametrizing FIFO
+
+**TCL Console output for num_cycles=5, write_interval=2, read_interval=3**
+
+![image](https://github.com/user-attachments/assets/1625c518-720d-4821-bdd3-705c7076a274)
+
+## How to Run 
+1. Clone this repo or download fifo_synch.v and tb_fifo_synch.sv
+2. Compile the files in your simulator (I used Vivado 2024.2).
+3. Check the console output for test results and open the generated waveform file for signal analysis. 
+
+## References
+1. [Clock Domain Crossing – Paul Franzon (YouTube)](https://www.youtube.com/watch?v=a_RL56y8Fpo&t=812s)
+2. *Digital Fundamentals*, Floyd, 10th Edition, Chapter 10: Memory and Storage
